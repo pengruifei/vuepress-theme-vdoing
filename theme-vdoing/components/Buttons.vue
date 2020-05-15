@@ -3,20 +3,20 @@
     <transition name="fade">
       <div
         title="返回顶部"
-        class="button go-to-top iconfont icon-fanhuidingbu"
+        class="button blur go-to-top iconfont icon-fanhuidingbu"
         v-show="showToTop"
         @click="scrollToTop"
       />
     </transition>
     <div
       title="去评论"
-      class="button go-to-comment iconfont icon-pinglun"
+      class="button blur go-to-comment iconfont icon-pinglun"
       v-show="showCommentBut"
       @click="scrollToComment"
     />
     <div
       title="主题模式"
-      class="button theme-mode-but iconfont icon-zhuti"
+      class="button blur theme-mode-but iconfont icon-zhuti"
       @mouseenter="showModeBox = true"
       @mouseleave="showModeBox = false"
       @click="showModeBox = true"
@@ -170,7 +170,7 @@ export default {
     }
   },
   watch: {
-    $route() {
+    '$route.path'() {
       this.handleShowCommentBut()
       this.getCommentTop()
     }
@@ -199,25 +199,27 @@ export default {
       margin-top .9rem
       text-align center
       cursor pointer
-      // color var(--textLightenColor)
-      background var(--bg)
+      transition all .5s
+      background var(--blurBg)
       &:hover
+        background $accentColor
+        box-shadow 0 0 15px $accentColor
         &:before
-          color $accentColor
+          color #fff
       .select-box
         margin 0
-        padding .5rem 0
+        padding .8rem 0
         position absolute
         bottom 0rem
         right 1.5rem
-        background var(--bg)
+        background var(--mainBg)
         border 1px solid var(--borderColor)
-        width 100px
-        border-radius 3px
-        box-shadow 0 2px 6px rgba(0,0,0,.25)
+        width 120px
+        border-radius 6px
+        box-shadow 0 0 30px lighten($accentColor, 40%)
         li 
           list-style none
-          line-height 1.8rem
+          line-height 2rem
           font-size .95rem
           &:hover
             color $accentColor

@@ -17,7 +17,7 @@
             </dt>
           </dl>
           <dl v-else-if="type(item) === 'object'" :key="index">
-            <dt :id="anchorText = encodeAnchor(item.title)">
+            <dt :id="anchorText = encodeUrl(item.title)">
               <a :href="`#${anchorText}`" class="header-anchor">#</a>
               {{`${index+1}. ${item.title}`}}
             </dt>
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import encodeMixin from '../mixins/encodeAnchor'
+import encodeMixin from '../mixins/encodeUrl'
 export default {
   mixins: [encodeMixin],
   data() {
@@ -80,7 +80,7 @@ export default {
     }
   },
   watch: {
-    $route() {
+    '$route.path'() {
       this.getPageData()
     }
   }
@@ -91,7 +91,7 @@ export default {
 dl,dd
   margin 0
 .column-wrapper
-  margin-top .6rem
+  margin-top 1rem
   display flex
   padding-bottom 2rem
   border-bottom 1px solid var(--borderColor)

@@ -29,9 +29,20 @@
         #bottom
       />
     </Sidebar>
-
+    
+    <!-- 首页 -->
     <Home v-if="$page.frontmatter.home"/>
 
+    <!-- 分类页 -->
+    <CategoriesPage v-else-if="$page.frontmatter.categoriesPage"/>
+
+    <!-- 标签页 -->
+    <TagsPage v-else-if="$page.frontmatter.tagsPage"/>
+
+    <!-- 归档页 -->
+    <ArchivesPage v-else-if="$page.frontmatter.archivesPage"/>
+
+    <!-- 文章页或其他页 -->
     <Page
       v-else
       :sidebar-items="sidebarItems"
@@ -46,10 +57,14 @@
       />
     </Page>
 
+    <Footer />
+
     <Buttons 
       ref="buttons"
       @toggle-theme-mode="toggleThemeMode"
     />
+
+    <BodyBgImg v-if="$themeConfig.bodyBgImg" />
   </div>
 </template>
 
@@ -57,8 +72,13 @@
 import Home from '@theme/components/Home.vue'
 import Navbar from '@theme/components/Navbar.vue'
 import Page from '@theme/components/Page.vue'
+import CategoriesPage from '@theme/components/CategoriesPage.vue'
+import TagsPage from '@theme/components/TagsPage.vue'
+import ArchivesPage from '@theme/components/ArchivesPage.vue'
 import Sidebar from '@theme/components/Sidebar.vue'
 import Buttons from '@theme/components/Buttons.vue'
+import Footer from '@theme/components/Footer'
+import BodyBgImg from '@theme/components/BodyBgImg'
 import { resolveSidebarItems } from '../util'
 import storage from 'good-storage' // 本地存储
 import _ from 'lodash'
@@ -66,7 +86,7 @@ import _ from 'lodash'
 const MOBILE_DESKTOP_BREAKPOINT = 719 // refer to config.styl
 
 export default {
-  components: { Home, Page, Sidebar, Navbar, Buttons },
+  components: { Home, Navbar, Page, CategoriesPage, TagsPage, ArchivesPage, Sidebar, Footer, Buttons, BodyBgImg },
 
   data () {
     return {
@@ -74,6 +94,17 @@ export default {
       isSidebarOpen: true,
       showSidebar: false,
       themeMode: 'light'
+    }
+  },
+  beforeMount(){
+    // 引入图标库
+    const social = this.$themeConfig.social
+    if(social && social.iconfontCssFile ) {
+      let linkElm = document.createElement("link")
+      linkElm.setAttribute('rel', 'stylesheet');
+      linkElm.setAttribute("type", "text/css")
+      linkElm.setAttribute("href", social.iconfontCssFile)
+      document.head.appendChild(linkElm)
     }
   },
   computed: {
@@ -130,8 +161,9 @@ export default {
           'sidebar-open': this.isSidebarOpen,
           'no-sidebar': !this.shouldShowSidebar,
           'have-rightmenu': this.showRightMenu,
+          'have-body-img': this.$themeConfig.bodyBgImg
         },
-        'theme-mode-' + this.themeMode,
+        // 'theme-mode-' + this.themeMode,
         userPageClass
       ]
     }
@@ -150,6 +182,7 @@ export default {
     } else {
       this.themeMode = mode
     }
+    this.setBodyClass()
   },
   mounted () {
     this.showSidebar = true // 解决移动端初始化页面时侧边栏闪现的问题
@@ -177,9 +210,15 @@ export default {
       if(this.isSidebarOpen) {  // 侧边栏打开时，恢复导航栏显示
         this.hideNavbar = false
       }
+    },
+    themeMode() {
+      this.setBodyClass()
     }
   },
   methods: {
+    setBodyClass() {
+      document.body.className = 'theme-mode-' + this.themeMode
+    },
     getScrollTop () {
       return window.pageYOffset
         || document.documentElement.scrollTop

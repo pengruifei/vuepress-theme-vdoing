@@ -10,6 +10,10 @@
 
         <div class="content-wrapper">
           <RightMenu v-if="showRightMenu"/>
+          <h1 v-if="showTitle">
+            <img :src="currentBadge" v-if="$themeConfig.titleBadge === false ? false : true">
+            {{this.$page.title}}
+          </h1>
           <Content class="theme-vdoing-content" />
         </div>
         
@@ -19,15 +23,14 @@
       </div>
 
       <UpdateArticle
-        :length="updateBarConfig && updateBarConfig.onArticle && updateBarConfig.onArticle.length || 3"
+        :length="3"
         :moreArticle="updateBarConfig && updateBarConfig.moreArticle"
         v-if="isShowUpdateBar"
-        />
+      />
 
       <slot name="bottom" />
     </main>
   
-    <Footer />
   </div>
 </template>
 
@@ -37,24 +40,28 @@ import PageNav from '@theme/components/PageNav.vue'
 import ArticleInfo from './ArticleInfo.vue'
 import Catalogue from './Catalogue.vue'
 import UpdateArticle from './UpdateArticle.vue'
-import Timeline from './Timeline.vue'
-import Footer from './Footer.vue'
 import RightMenu from './RightMenu.vue'
 
+import TitleBadgeMixin from '../mixins/titleBadge'
+
 export default {
+  mixins: [TitleBadgeMixin],
   data() {
     return {
       updateBarConfig: null
     }
   },
   props: ['sidebarItems'],
-  components: { PageEdit, PageNav, ArticleInfo, Catalogue, UpdateArticle, Timeline, Footer, RightMenu},
+  components: { PageEdit, PageNav, ArticleInfo, Catalogue, UpdateArticle, RightMenu},
   created() {
     this.updateBarConfig = this.$themeConfig.updateBar
   },
   computed: {
     isShowUpdateBar() {
-      return this.updateBarConfig && this.updateBarConfig.onArticle && this.updateBarConfig.onArticle.isShow === false ? false : true
+      return this.updateBarConfig && this.updateBarConfig.showToArticle === false ? false : true 
+    },
+    showTitle() {
+      return !this.$frontmatter.pageComponent
     },
     showRightMenu(){
       return this.$page.headers && (this.$frontmatter && this.$frontmatter.sidebar && this.$frontmatter.sidebar !== false) !== false
@@ -73,21 +80,24 @@ export default {
 
 <style lang="stylus">
 @require '../styles/wrapper.styl'
-@require '../styles/variable.styl'
 
 .page
   padding-bottom 2rem
   display block
   padding-top ($navbarHeight)
-  @media (min-width $cardLayout)
+  @media (min-width $contentWidth + 80)
     padding-top ($navbarHeight + 2rem)
-    background var(--pageBg)
   >*
     @extend $vdoing-wrapper
 
 .theme-vdoing-wrapper
   .content-wrapper
     position relative
+  h1 img
+    margin-bottom -0.2rem
+    max-width 2.2rem
+    max-height 2.2rem
+  
 
 /**
  * 右侧菜单的自适应
